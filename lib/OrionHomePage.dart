@@ -12,14 +12,15 @@ class OrionHomePage extends StatefulWidget {
 class OrionHomePageState extends State<OrionHomePage> {
 
   TextEditingController _c;
-  String currentUrl = "Test";
   var tiles = new List<Tile>();
 
   void onSaveButton() {
     setState(() {
-      currentUrl = _c.text;
-      Tile tile = new Tile();
-      tile.name = _c.text;
+      var tokens = _c.text.split(".");
+      String name = tokens.length > 1 ? tokens[1] : tokens[tokens.length-1];
+
+      // TODO: add name and url properly
+      Tile tile = Tile( name,  _c.text);
       tiles.add(tile);
     });
     Navigator.pop(context);
@@ -46,7 +47,6 @@ class OrionHomePageState extends State<OrionHomePage> {
   @override
   void initState() {
     _c = new TextEditingController();
-    currentUrl = "EMPTY";
     super.initState();
   }
 
@@ -56,18 +56,13 @@ class OrionHomePageState extends State<OrionHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Entered URL :',
-            ),
-            Text(
-              currentUrl,
-            ),
-          ],
-        ),
+      body : GridView.count(crossAxisCount: 3,
+        crossAxisSpacing: 5,
+        mainAxisSpacing: 5,
+        padding: EdgeInsets.all(10.0),
+        children: List.generate(tiles.length, (index) {
+          return Center(child: TileCard(tile : tiles[index]));
+        }),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: createInputPopUp,
