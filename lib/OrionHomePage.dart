@@ -11,16 +11,33 @@ class OrionHomePage extends StatefulWidget {
 
 class OrionHomePageState extends State<OrionHomePage> {
 
-  TextEditingController _c;
+  TextEditingController _nameCtrl;
+  TextEditingController _urlCtrl;
+
   var tiles = new List<Tile>();
 
   void onSaveButton() {
     setState(() {
-      var tokens = _c.text.split(".");
-      String name = tokens.length > 1 ? tokens[1] : tokens[tokens.length-1];
+
+      var name = "";
+      if (_nameCtrl == null || _nameCtrl.text.isEmpty) {
+        var urlStr = _urlCtrl.text;
+        print(name);
+        if( urlStr.startsWith("http")){
+          print("if");
+          name = Uri.parse(urlStr).host.toLowerCase();
+          name = name.split(".")[1];
+        } else {
+          print(name);
+          name = urlStr.split(".")[0];
+        }
+
+      } else {
+        name = _nameCtrl.text;
+      }
 
       // TODO: add name and url properly
-      Tile tile = Tile( name,  _c.text);
+      Tile tile = Tile(name,  _urlCtrl.text);
       tiles.add(tile);
     });
     Navigator.pop(context);
@@ -29,11 +46,31 @@ class OrionHomePageState extends State<OrionHomePage> {
   void createInputPopUp() {
     var popDialog = new Dialog(
       child: new Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            new TextField(
-                decoration: new InputDecoration(hintText: "Enter URL"),
-                controller: _c),
-            new FlatButton(
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: new Text("Enter URL :"),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: new TextField(
+                  decoration: new InputDecoration(hintText: "Enter App URL"),
+                  controller: _urlCtrl),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: new Text("Enter URL :"),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: new TextField(
+                  decoration: new InputDecoration(hintText: "Enter App Name"),
+                 controller: _nameCtrl,
+              ),
+            ),
+            new ElevatedButton(
               child: new Text("Add"),
               onPressed: onSaveButton,
             )
@@ -46,7 +83,7 @@ class OrionHomePageState extends State<OrionHomePage> {
 
   @override
   void initState() {
-    _c = new TextEditingController();
+    _urlCtrl = new TextEditingController();
     super.initState();
   }
 
