@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:orion/Tile.dart';
 
@@ -14,7 +16,15 @@ class OrionHomePageState extends State<OrionHomePage> {
   TextEditingController _nameCtrl;
   TextEditingController _urlCtrl;
 
-  var tiles = new List<Tile>();
+  var tilesMap = new HashMap<String,Tile>();
+
+   String stripString(String input, String strip) {
+    var tokens = input.split(".");
+    if (tokens[0].toLowerCase().startsWith(strip.toLowerCase())) {
+      tokens.removeAt(0);
+    }
+    return tokens[0];
+  }
 
   void onSaveButton() {
     setState(() {
@@ -22,15 +32,8 @@ class OrionHomePageState extends State<OrionHomePage> {
       var name = "";
       if (_nameCtrl == null || _nameCtrl.text.isEmpty) {
         var urlStr = _urlCtrl.text;
-        print(name);
-        if( urlStr.startsWith("http")){
-          print("if");
-          name = Uri.parse(urlStr).host.toLowerCase();
-          name = name.split(".")[1];
-        } else {
-          print(name);
-          name = urlStr.split(".")[0];
-        }
+        name = Uri.parse(urlStr).host.toLowerCase();
+        name = stripString(name, "www");
 
       } else {
         name = _nameCtrl.text;
@@ -38,7 +41,7 @@ class OrionHomePageState extends State<OrionHomePage> {
 
       // TODO: add name and url properly
       Tile tile = Tile(name,  _urlCtrl.text);
-      tiles.add(tile);
+      tilesMap[name]=tile;
     });
     Navigator.pop(context);
   }
@@ -67,8 +70,7 @@ class OrionHomePageState extends State<OrionHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: new TextField(
                   decoration: new InputDecoration(hintText: "Enter App Name"),
-                 controller: _nameCtrl,
-              ),
+                 controller: _nameCtrl),
             ),
             new ElevatedButton(
               child: new Text("Add"),
@@ -83,13 +85,15 @@ class OrionHomePageState extends State<OrionHomePage> {
 
   @override
   void initState() {
-    _urlCtrl = new TextEditingController();
+     _nameCtrl = new TextEditingController();
+     _urlCtrl = new TextEditingController();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    var tiles = tilesMap.values.toList();
+     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
