@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:orion/WebViewPage.dart';
 
 class Tile {
   String name;
@@ -18,8 +20,7 @@ class TileCard extends StatelessWidget {
 
   TileCard({this.tile});
 
-  @override
-  Widget build(BuildContext context) {
+  getCard() {
     return ClipRRect(
         borderRadius: BorderRadius.circular(10.0),
         child: Card(
@@ -34,6 +35,23 @@ class TileCard extends StatelessWidget {
                     ]
                 )
             )
+        )
+    );
+  }
+
+  void handleTap(BuildContext context, String url) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => WebViewPage(url : url)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: GestureDetector(
+          onTap: () =>  handleTap(context, tile.url),
+          child: getCard(),
         )
     );
   }
