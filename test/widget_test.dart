@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:orion/StringUtils.dart';
 
 import 'package:orion/main.dart';
 
@@ -26,5 +27,20 @@ void main() {
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
+  });
+
+  test('Should remove the matched front string', () {
+    expect("www.youtube.com".stripPrefix("www."), "youtube.com");
+    expect("WWW.youtube.com".stripPrefix("WWW."), "youtube.com");
+    expect("www1.youtube.com".stripPrefix("www."), "www1.youtube.com");
+  });
+
+  test('get Hostname from an URL', () {
+    expect(getDomain('www.youtube.com'), "youtube");
+    expect(getDomain('WWW.youtube.com'), "youtube");
+    expect(getDomain('http://www.youtube.com'), "youtube");
+    expect(getDomain('http://youtube.com'), "youtube");
+    expect(getDomain('https://www.youtube.com'), "youtube");
+    expect(getDomain('https://youtube.com'), "youtube");
   });
 }
