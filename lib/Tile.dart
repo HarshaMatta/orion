@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:orion/WebViewPage.dart';
 
 class Tile {

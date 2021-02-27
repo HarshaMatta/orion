@@ -1,7 +1,10 @@
 import 'dart:collection';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:orion/Tile.dart';
+import 'package:orion/StringUtils.dart';
+import 'package:orion/Preferences.dart';
 
 class OrionHomePage extends StatefulWidget {
   OrionHomePage({Key key, this.title}) : super(key: key);
@@ -12,36 +15,38 @@ class OrionHomePage extends StatefulWidget {
 }
 
 class OrionHomePageState extends State<OrionHomePage> {
+  TextEditingController nameCtrl;
+  TextEditingController urlCtrl;
+  HashMap<String, Tile> tilesMap = new HashMap<String, Tile>(); 
 
-  TextEditingController _nameCtrl;
-  TextEditingController _urlCtrl;
+  loadAppsFromPref() async {
+    final appNames = await loadAppNameValue();
 
-  var tilesMap = new HashMap<String,Tile>();
-
-   String stripString(String input, String strip) {
-    var tokens = input.split(".");
-    if (tokens[0].toLowerCase().startsWith(strip.toLowerCase())) {
-      tokens.removeAt(0);
-    }
-    return tokens[0];
+    setState(() {
+      tilesMap.clear();
+      appNames.forEach((key, value) {
+        tilesMap[key] = Tile(key, value);
+      });
+    });
   }
 
   void onSaveButton() {
     setState(() {
 
       var name = "";
-      if (_nameCtrl == null || _nameCtrl.text.isEmpty) {
-        var urlStr = _urlCtrl.text;
-        name = Uri.parse(urlStr).host.toLowerCase();
-        name = stripString(name, "www");
-
+      if (nameCtrl == null || nameCtrl.text.isEmpty) {
+        name = getDomain(urlCtrl.text);
       } else {
-        name = _nameCtrl.text;
+        name = nameCtrl.text;
       }
 
-      // TODO: add name and url properly
-      Tile tile = Tile(name,  _urlCtrl.text);
-      tilesMap[name]=tile;
+      if(name.isNotEmpty && urlCtrl.text.isNotEmpty) {
+        Tile tile = Tile(name, urlCtrl.text);
+        tilesMap[name] = tile;
+
+        // save in preferences
+        saveAppNameValue(name, urlCtrl.text);
+      }
     });
     Navigator.pop(context);
   }
@@ -59,18 +64,18 @@ class OrionHomePageState extends State<OrionHomePage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: new TextField(
-                  decoration: new InputDecoration(hintText: "Enter App URL"),
-                  controller: _urlCtrl),
+                  decoration: new InputDecoration(hintText: "Enter Url"),
+                  controller: urlCtrl),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: new Text("Enter URL :"),
+              child: new Text("Enter App Name :"),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: new TextField(
                   decoration: new InputDecoration(hintText: "Enter App Name"),
-                 controller: _nameCtrl),
+                 controller: nameCtrl),
             ),
             new ElevatedButton(
               child: new Text("Add"),
@@ -85,29 +90,30 @@ class OrionHomePageState extends State<OrionHomePage> {
 
   @override
   void initState() {
-     _nameCtrl = new TextEditingController();
-     _urlCtrl = new TextEditingController();
+    nameCtrl = new TextEditingController();
+    urlCtrl = new TextEditingController();
     super.initState();
+    loadAppsFromPref();
   }
 
   @override
   Widget build(BuildContext context) {
     var tiles = tilesMap.values.toList();
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body : GridView.count(crossAxisCount: 3,
+      body: GridView.count(crossAxisCount: 3,
         crossAxisSpacing: 5,
         mainAxisSpacing: 5,
         padding: EdgeInsets.all(10.0),
         children: List.generate(tiles.length, (index) {
-          return Center(child: TileCard(tile : tiles[index]));
+          return Center(child: TileCard(tile: tiles[index]));
         }),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: createInputPopUp,
-        tooltip:  'ShowDialog',
+        tooltip: 'ShowDialog',
         child: Icon(Icons.add),
       ),
       // child: Icon(Icons.add), // This trailing comma makes auto-formatting nicer for build methods.
