@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -28,27 +29,23 @@ class WebViewPageState extends State<WebViewPage> {
   }
 
   @override
+  void initState() {
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(url),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(
-                  Icons.arrow_back_ios_outlined,
-                  color: Colors.white,
-              ),
-              onPressed: null,
-          ),
-        ],
-      ),
-
-      body: WebView(
-        initialUrl : url,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController){
-          _controller.complete(webViewController);
-        },
+      body: SafeArea(
+        child: WebView(
+          initialUrl : url,
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController){
+            _controller.complete(webViewController);
+          },
+        ),
+        bottom: false,
       ),
       floatingActionButton: FutureBuilder<WebViewController>(
 

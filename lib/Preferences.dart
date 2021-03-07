@@ -40,3 +40,8 @@ void saveAppNameValue(String name, String url) async {
     prefs.setString(name + APP_SUFFIX, url);
   }
 }
+
+void deleteFromPref(String name) async{
+  final prefs = await SharedPreferences.getInstance();
+  prefs.remove(name + APP_SUFFIX);
+}

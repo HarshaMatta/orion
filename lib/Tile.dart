@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:orion/WebViewPage.dart';
+import 'package:orion/OrionHomePage.dart';
 
 class Tile {
   String name;
@@ -16,8 +17,9 @@ class Tile {
 
 class TileCard extends StatelessWidget {
   final Tile tile;
+  final OrionHomePageState parent;
 
-  TileCard({this.tile});
+  TileCard({this.tile, this.parent});
 
   getCard() {
     return ClipRRect(
@@ -51,6 +53,16 @@ class TileCard extends StatelessWidget {
         child: GestureDetector(
           onTap: () =>  handleTap(context, tile.url),
           child: getCard(),
+          onLongPress: (){
+              List<String> btns = new List<String>();
+              btns.add("UPDATE");
+              btns.add("DELETE");
+              parent.setNameCtrl(tile.name);
+              parent.setUrlCtrl(tile.url);
+              parent.oldName = tile.name;
+              parent.oldUrl = tile.url;
+              parent.createInputPopUp(btns,);
+          },
         )
     );
   }
