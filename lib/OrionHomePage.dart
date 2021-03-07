@@ -17,7 +17,16 @@ class OrionHomePage extends StatefulWidget {
 class OrionHomePageState extends State<OrionHomePage> {
   TextEditingController nameCtrl;
   TextEditingController urlCtrl;
+  String oldName;
+  String oldUrl;
   HashMap<String, Tile> tilesMap = new HashMap<String, Tile>(); 
+
+  void setNameCtrl(String name) {
+    nameCtrl.text = name;
+  }
+  void setUrlCtrl(String url) {
+    urlCtrl.text = url;
+  }
 
   loadAppsFromPref() async {
     final appNames = await loadAppNameValue();
@@ -32,26 +41,88 @@ class OrionHomePageState extends State<OrionHomePage> {
 
   void onSaveButton() {
     setState(() {
-
-      var name = "";
-      if (nameCtrl == null || nameCtrl.text.isEmpty) {
-        name = getDomain(urlCtrl.text);
-      } else {
-        name = nameCtrl.text;
-      }
-
-      if(name.isNotEmpty && urlCtrl.text.isNotEmpty) {
-        Tile tile = Tile(name, urlCtrl.text);
-        tilesMap[name] = tile;
-
-        // save in preferences
-        saveAppNameValue(name, urlCtrl.text);
-      }
+      saveApp();
     });
     Navigator.pop(context);
   }
 
-  void createInputPopUp() {
+  void saveApp() {
+    var name = "";
+    if (nameCtrl == null || nameCtrl.text.isEmpty) {
+      name = getDomain(urlCtrl.text);
+    } else {
+      name = nameCtrl.text;
+    }
+    
+    if(name.isNotEmpty && urlCtrl.text.isNotEmpty) {
+      Tile tile = Tile(name, urlCtrl.text);
+      tilesMap[name] = tile;
+    
+      // save in preferences
+      saveAppNameValue(name, urlCtrl.text);
+    }
+  }
+
+  void deleteApp() {
+    deleteFromPref(oldName);
+    tilesMap.remove(oldName);
+  }
+
+  onUpdateButton () {
+    setState(() {
+      deleteApp();
+      saveApp();
+    });
+    Navigator.pop(context);
+  }
+
+  onDeleteButton() {
+    setState(() {
+      deleteApp();
+    });
+    Navigator.pop(context);
+  }
+
+  Row createRowButtons(List<String> btnNames) {
+    List<Widget> btns = new List<Widget>();
+
+    btnNames.forEach((e) =>
+    {
+      if (e == "ADD") {
+        btns.add(
+            new ElevatedButton(
+              child: new Text("Add"),
+              onPressed: onSaveButton,
+            )
+        )
+      }
+      else
+        if(e == "UPDATE") {
+          btns.add(
+              new ElevatedButton(
+                child: new Text("Update"),
+                onPressed: onUpdateButton,
+              )
+          )
+        }
+        else
+          if (e == "DELETE") {
+            btns.add(
+                new ElevatedButton(
+                  child: new Text("Delete"),
+                  onPressed: onDeleteButton,
+                )
+            )
+          }
+    });
+
+    return new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: btns
+    );
+  }
+
+  void createInputPopUp(List<String> btnNames) {
     var popDialog = new Dialog(
       child: new Column(
           mainAxisSize: MainAxisSize.min,
@@ -77,10 +148,7 @@ class OrionHomePageState extends State<OrionHomePage> {
                   decoration: new InputDecoration(hintText: "Enter App Name"),
                  controller: nameCtrl),
             ),
-            new ElevatedButton(
-              child: new Text("Add"),
-              onPressed: onSaveButton,
-            )
+            createRowButtons(btnNames)
           ]
       ),
     );
@@ -108,11 +176,17 @@ class OrionHomePageState extends State<OrionHomePage> {
         mainAxisSpacing: 5,
         padding: EdgeInsets.all(10.0),
         children: List.generate(tiles.length, (index) {
-          return Center(child: TileCard(tile: tiles[index]));
+          return Center(child: TileCard(tile: tiles[index], parent: this));
         }),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: createInputPopUp,
+        onPressed: () {
+          nameCtrl.clear();
+          urlCtrl.clear();
+          List<String> btns = new List<String>();
+          btns.add("ADD");
+          createInputPopUp(btns);
+        },
         tooltip: 'ShowDialog',
         child: Icon(Icons.add),
       ),
