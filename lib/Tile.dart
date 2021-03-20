@@ -22,22 +22,22 @@ class TileCard extends StatelessWidget {
   TileCard({this.tile, this.parent});
 
   getCard() {
-    return ClipRRect(
-        borderRadius: BorderRadius.circular(10.0),
-        child: Card(
-            elevation: 1,
+
+    return Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20)
+            ),
             color: RandomColor().getColor(),
             child: Center(
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Icon(Icons.link, size: 40),
-                      Text(tile.name, style: TextStyle(fontSize: 24))
+                      Icon(Icons.link, size: 50),
+                      Text(tile.name, style: TextStyle(fontSize: 12))
                     ]
                 )
             )
-        )
-    );
+        );
   }
 
   void handleTap(BuildContext context, String url) {
@@ -49,7 +49,7 @@ class TileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(20),
         child: GestureDetector(
           onTap: () =>  handleTap(context, tile.url),
           child: getCard(),
@@ -62,6 +62,7 @@ class TileCard extends StatelessWidget {
               parent.oldName = tile.name;
               parent.oldUrl = tile.url;
               parent.createInputPopUp(btns,);
+
           },
         )
     );

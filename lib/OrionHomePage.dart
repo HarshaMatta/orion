@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:orion/IconEditor.dart';
 import 'package:orion/Tile.dart';
 import 'package:orion/StringUtils.dart';
 import 'package:orion/Preferences.dart';
@@ -147,6 +148,10 @@ class OrionHomePageState extends State<OrionHomePage> {
               child: new TextField(
                   decoration: new InputDecoration(hintText: "Enter App Name"),
                  controller: nameCtrl),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: new IconEditor()
             ),
             createRowButtons(btnNames)
           ]
