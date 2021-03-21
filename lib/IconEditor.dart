@@ -3,10 +3,21 @@ import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// TODO: how to access state ?
 class IconEditor extends StatefulWidget {
+  IconEditorState state;
   @override
   State<StatefulWidget> createState() {
-    return new IconEditorState();
+    state = new IconEditorState();
+    return state;
+  }
+
+  int getColor() {
+    return state.getColor();
+  }
+
+  int getIcon(){
+    return state.getIcon();
   }
 }
 class IconEditorState extends State<IconEditor> {
@@ -18,70 +29,126 @@ class IconEditorState extends State<IconEditor> {
 
   List <IconData> iconNames =
   [
-    Icons.camera_alt_outlined,
+    Icons.accessibility,
+    Icons.account_balance,
     Icons.account_circle,
+    Icons.article,
     Icons.android,
+    Icons.build,
+    Icons.credit_card,
+    Icons.dashboard,
     Icons.done_outline,
-    Icons.camera_alt_outlined,
-    Icons.account_circle,
-    Icons.android,
-    Icons.done_outline,
+    Icons.eco,
+    Icons.explore,
+    Icons.extension,
+    Icons.face,
+    Icons.fingerprint,
+    Icons.leaderboard,
+    Icons.question_answer,
+    Icons.reorder,
+    Icons.room,
+    Icons.settings,
+    Icons.shopping_cart,
+    Icons.sticky_note_2,
+    Icons.sports_esports,
+    Icons.videogame_asset,
+    Icons.movie,
+    Icons.web,
+    Icons.chat_bubble,
+    Icons.email,
+    Icons.qr_code,
+    Icons.flag,
+    Icons.send,
+    Icons.folder,
+    Icons.desktop_mac,
+    Icons.smartphone,
+    Icons.wb_sunny,
+    Icons.map,
+    Icons.time_to_leave,
+    Icons.navigation,
+    Icons.flight,
+    Icons.lunch_dining,
+    Icons.all_inclusive,
+    Icons.sd_card,
+    Icons.book,
+    Icons.menu_book,
+    Icons.star,
   ];
 
   List <Color> colors =
-  [Colors.cyan,
-    Colors.blue,
+  [
     Colors.purple,
-    Colors.red];
+    Colors.indigo,
+    Colors.blue,
+    Colors.lightBlue,
+    Colors.cyan,
+    Colors.teal,
+    Colors.green,
+    Colors.lightGreen,
+    Colors.lime,
+    Colors.yellow,
+    Colors.amber,
+    Colors.deepOrange,
+    Colors.red,
+  ];
+
+  int getColor() {
+    return colors[activeColorIdx].value;
+  }
+
+  int getIcon() {
+    return iconNames[activeIconIdx].codePoint;
+  }
 
   getIconButton(IconData icon, Color color, int idx, bool select) {
     return Container(
-        color: (select == true) ? Colors.black:
+        color: (select == true) ? Colors.black :
         Colors.white,
-        padding: EdgeInsets.all(5),
-      child: Container(
-        color: color,
-        child: new IconButton(
-          color: Colors.white,
-           iconSize: 40,
-          icon: Icon(
-              icon
-          ),
-          alignment: Alignment.center,
-          onPressed: () {
-            setState(() {
-              activeIconIdx = idx;
-            });
-          },
+        padding: EdgeInsets.all(2),
+        child: Container(
+            color: color,
+            child: new IconButton(
+              color: Colors.white,
+              iconSize: 34,
+              icon: Icon(
+                  icon
+              ),
+              alignment: Alignment.center,
+              onPressed: () {
+                setState(() {
+                  activeIconIdx = idx;
+                });
+              },
+            )
         )
-      )
-      );
+    );
   }
 
   getColorButton(Color color, int idx, bool select) {
     return Container(
-      color: (select == true) ? Colors.black:
+        color: (select == true) ? Colors.black :
         Colors.white,
-     padding: EdgeInsets.all(5),
-     child:FlatButton(
-      child: Text(''),
-      color: color,
-      onPressed: () {
-        setState(() {
-          activeColor = color;
-          activeColorIdx = idx;
-        });
-      },
-    )
+        padding: EdgeInsets.all(2),
+        child: FlatButton(
+          child: Text(''),
+          color: color,
+          onPressed: () {
+            setState(() {
+              activeColor = color;
+              activeColorIdx = idx;
+            });
+          },
+        )
     );
   }
 
   getColorGrid() {
     return GridView.count(
-        crossAxisCount: 4,
-        crossAxisSpacing: 5,
-        mainAxisSpacing: 5,
-        padding: EdgeInsets.all(10.0),
+        scrollDirection: Axis.horizontal,
+        crossAxisCount: 2,
+        crossAxisSpacing: 3,
+        mainAxisSpacing: 3,
+        padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
         children: List.generate(colors.length, (index) {
           return getColorButton(colors[index], index, index == activeColorIdx);
         })
@@ -90,12 +157,14 @@ class IconEditorState extends State<IconEditor> {
 
   getIconGrid() {
     return GridView.count(
-        crossAxisCount: 4,
-        crossAxisSpacing: 5,
-        mainAxisSpacing: 5,
-        padding: EdgeInsets.all(10.0),
+        scrollDirection: Axis.horizontal,
+        crossAxisCount: 2,
+        crossAxisSpacing: 3,
+        mainAxisSpacing: 3,
+        padding: EdgeInsets.all(8),
         children: List.generate(iconNames.length, (index) {
-          return getIconButton(iconNames[index], activeColor, index ,index == activeIconIdx);
+          return getIconButton(
+            iconNames[index], activeColor, index, index == activeIconIdx,);
         })
     );
   }
@@ -105,33 +174,6 @@ class IconEditorState extends State<IconEditor> {
     // TODO: implement initState
     super.initState();
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Column(
-  //       // mainAxisSize : MainAxisSize.max,
-  //       children: <Widget>[
-  //         Row(
-  //             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  //             children: <Widget>[
-  //               OutlineButton(
-  //                 onPressed: () { setState(() {
-  //                   colorMode = true;
-  //                 });} ,
-  //                 child: Text("Color"),
-  //               ),
-  //               OutlineButton(onPressed: () { setState(() {
-  //                 colorMode = false;
-  //               });} ,
-  //                 child: Text("Icon"),
-  //               ),
-  //             ]),
-  //         Container(
-  //           height: 200,
-  //                 child: (colorMode == true) ? getColorGrid() : getIconGrid()
-  //             )
-  //       ]);
-  // }
 
   final Map<int, Widget> myTabs = const <int, Widget>{
     0: Text("      Color      "),
@@ -154,7 +196,7 @@ class IconEditorState extends State<IconEditor> {
             },
           ),
           Container(
-              height: 200,
+              height: 120,
               child: (tabIndex == 0) ? getColorGrid() : getIconGrid()
           )
         ]);

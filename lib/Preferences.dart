@@ -1,7 +1,10 @@
 
+import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const String APP_SUFFIX = "_app";
+const String URL_SUFFIX = "_url";
+const String ICON_SUFFIX = "_icon";
+const String COLOR_SUFFIX = "_color";
 
 // Future<String> readStringPref(String key) async {
 //   final prefs = await SharedPreferences.getInstance();
@@ -18,15 +21,26 @@ const String APP_SUFFIX = "_app";
 //   prefs.setStringList(key, value);
 // }
 
-Future<Map<String, String>> loadAppNameValue() async {
+class AppProps {
+  String name;
+  String url;
+  int iconCodePoint;
+  int color;
+}
+
+Future<Map<String, AppProps>> loadAppNameValue() async {
   final prefs = await SharedPreferences.getInstance();
-  Map<String, String> appNames = new Map<String, String>();
+  Map<String, AppProps> appNames = new Map<String, AppProps>();
   prefs.getKeys().forEach((key) {
-    if(key.endsWith(APP_SUFFIX)) {
-      var name = key.substring(0, key.length - APP_SUFFIX.length);
+    if(key.endsWith(URL_SUFFIX)) {
+      var name = key.substring(0, key.length - URL_SUFFIX.length);
       if( name.isNotEmpty) {
-        var url = prefs.getString(key);
-        appNames[name] = url;
+        var props = new AppProps();
+        props.name = name;
+        props.url = prefs.getString(key);
+        props.iconCodePoint = prefs.getInt(name+ICON_SUFFIX);
+        props.color = prefs.getInt(name+COLOR_SUFFIX);
+        appNames[name] = props;
       }
     }
   });
@@ -34,14 +48,18 @@ Future<Map<String, String>> loadAppNameValue() async {
   return appNames;
 }
 
-void saveAppNameValue(String name, String url) async {
+void saveAppNameValue(String name, String url, int icon, int color) async {
   if(name.isNotEmpty && url.isNotEmpty) {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(name + APP_SUFFIX, url);
+    prefs.setString(name + URL_SUFFIX, url);
+    prefs.setInt(name+ICON_SUFFIX, icon);
+    prefs.setInt(name+COLOR_SUFFIX, color);
   }
 }
 
 void deleteFromPref(String name) async{
   final prefs = await SharedPreferences.getInstance();
-  prefs.remove(name + APP_SUFFIX);
+  prefs.remove(name + URL_SUFFIX);
+  prefs.remove(name + ICON_SUFFIX);
+  prefs.remove(name + COLOR_SUFFIX);
 }

@@ -18,9 +18,10 @@ class OrionHomePage extends StatefulWidget {
 class OrionHomePageState extends State<OrionHomePage> {
   TextEditingController nameCtrl;
   TextEditingController urlCtrl;
+  IconEditor iconEditor = new IconEditor();
   String oldName;
   String oldUrl;
-  HashMap<String, Tile> tilesMap = new HashMap<String, Tile>(); 
+  HashMap<String, Tile> tilesMap = new HashMap<String, Tile>();
 
   void setNameCtrl(String name) {
     nameCtrl.text = name;
@@ -35,7 +36,7 @@ class OrionHomePageState extends State<OrionHomePage> {
     setState(() {
       tilesMap.clear();
       appNames.forEach((key, value) {
-        tilesMap[key] = Tile(key, value);
+        tilesMap[key] = Tile(key, value.url, value.iconCodePoint, value.color);
       });
     });
   }
@@ -56,11 +57,11 @@ class OrionHomePageState extends State<OrionHomePage> {
     }
     
     if(name.isNotEmpty && urlCtrl.text.isNotEmpty) {
-      Tile tile = Tile(name, urlCtrl.text);
+      Tile tile = Tile(name, urlCtrl.text, iconEditor.getIcon(), iconEditor.getColor());
       tilesMap[name] = tile;
     
       // save in preferences
-      saveAppNameValue(name, urlCtrl.text);
+      saveAppNameValue(name, urlCtrl.text, iconEditor.getIcon(), iconEditor.getColor());
     }
   }
 
@@ -129,29 +130,29 @@ class OrionHomePageState extends State<OrionHomePage> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               child: new Text("Enter URL :"),
             ),
 
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               child: new TextField(
                   decoration: new InputDecoration(hintText: "Enter Url"),
                   controller: urlCtrl),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               child: new Text("Enter App Name :"),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
               child: new TextField(
                   decoration: new InputDecoration(hintText: "Enter App Name"),
                  controller: nameCtrl),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: new IconEditor()
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+              child: iconEditor
             ),
             createRowButtons(btnNames)
           ]

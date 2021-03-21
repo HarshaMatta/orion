@@ -8,10 +8,14 @@ import 'package:orion/OrionHomePage.dart';
 class Tile {
   String name;
   String url;
+  int iconCodePoint;
+  int color;
 
-  Tile(String xName, String xUrl) {
+  Tile(String xName, String xUrl, int xCodePoint, int xColor) {
     this.name = xName;
     this.url = xUrl;
+    this.iconCodePoint = xCodePoint;
+    this.color = xColor;
   }
 }
 
@@ -24,20 +28,20 @@ class TileCard extends StatelessWidget {
   getCard() {
 
     return Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)
-            ),
-            color: RandomColor().getColor(),
-            child: Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Icon(Icons.link, size: 50),
-                      Text(tile.name, style: TextStyle(fontSize: 12))
-                    ]
-                )
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)
+        ),
+        color: Color(tile.color),    // RandomColor().getColor(),
+        child: Center(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Icon(IconData(tile.iconCodePoint, fontFamily: 'MaterialIcons'), size: 50),  //Icon(Icons.link, size: 50),
+                  Text(tile.name, style: TextStyle(fontSize: 12))
+                ]
             )
-        );
+        )
+    );
   }
 
   void handleTap(BuildContext context, String url) {
@@ -69,9 +73,9 @@ class TileCard extends StatelessWidget {
   }
 }
 
-class RandomColor {
-  Random random = Random();
-  Color getColor() {
-    return Color.fromARGB(random.nextInt(255), random.nextInt(255), random.nextInt(255), random.nextInt(255));
-  }
-}
+// class RandomColor {
+//   Random random = Random();
+//   Color getColor() {
+//     return Color.fromARGB(random.nextInt(255), random.nextInt(255), random.nextInt(255), random.nextInt(255));
+//   }
+// }
