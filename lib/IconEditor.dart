@@ -3,31 +3,8 @@ import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-// TODO: how to access state ?
-class IconEditor extends StatefulWidget {
-  IconEditorState state;
-  @override
-  State<StatefulWidget> createState() {
-    state = new IconEditorState();
-    return state;
-  }
-
-  int getColor() {
-    return state.getColor();
-  }
-
-  int getIcon(){
-    return state.getIcon();
-  }
-}
-class IconEditorState extends State<IconEditor> {
-
-  int tabIndex = 0;
-  var activeColor = Colors.blue;
-  var activeIconIdx = 0;
-  var activeColorIdx = 0;
-
-  List <IconData> iconNames =
+class MaterialResources {
+  static List <IconData> iconNames =
   [
     Icons.accessibility,
     Icons.account_balance,
@@ -75,7 +52,7 @@ class IconEditorState extends State<IconEditor> {
     Icons.star,
   ];
 
-  List <Color> colors =
+  static List <Color> colors =
   [
     Colors.purple,
     Colors.indigo,
@@ -92,12 +69,95 @@ class IconEditorState extends State<IconEditor> {
     Colors.red,
   ];
 
+  static int getColorIndex(int colorVal) {
+    int idx = 0;
+    colors.asMap().forEach((index, color) {
+      if (color.value == colorVal){
+        idx = index;
+      }
+    });
+    return idx; // default to zero
+  }
+
+  static int getIconIndex(int codePoint) {
+    // find the index
+    int idx = 0;
+    iconNames.asMap().forEach((index, icon) {
+      if (icon.codePoint == codePoint) {
+        idx = index;
+      }
+    });
+    return idx; // default to zero
+  }
+
+  // acquiring the index from both colorVal and codePoint
+
+  // TODO: check index bounds
+  static int getColorFromIdx(int colorIdx) {
+    return colors[colorIdx].value;
+  }
+
+  // TODO: check index bounds
+  static int getIconFromIdx(int iconIdx) {
+    return iconNames[iconIdx].codePoint;
+  }
+  //acquiring the icon or color name from the index
+
+}
+
+// TODO: how to access state ?
+class IconEditor extends StatefulWidget {
+  IconEditorState state;
+  int colorIdx;
+  int iconIdx;
+  IconEditor(int colorIdx, int iconIdx) {
+    this.colorIdx = colorIdx;
+    this.iconIdx = iconIdx;
+  }
+  // setting icon and color index for the IconEditor
+
+  void setColorIdx(int colIdx) {
+    this.colorIdx = colIdx;
+  }
+
+  void setIconIdx(int iconIdx) {
+    this.iconIdx = iconIdx;
+  }
+
+  @override
+  State<StatefulWidget> createState() {
+    state = new IconEditorState(this.colorIdx, this.iconIdx);
+    return state;
+  }
+
   int getColor() {
-    return colors[activeColorIdx].value;
+    return state.getColor();
+  }
+
+  int getIcon(){
+    return state.getIcon();
+  }
+}
+class IconEditorState extends State<IconEditor> {
+
+  int tabIndex = 0;
+  var activeColor = Colors.blue;
+  var activeIconIdx = 0;
+  var activeColorIdx = 0;
+
+  //creating active variables that need to be able to automatically refresh
+
+  IconEditorState(int colorIdx, int iconIdx){
+    this.activeColorIdx = colorIdx;
+    this.activeIconIdx = iconIdx;
+  }
+
+  int getColor() {
+    return MaterialResources.getColorFromIdx(activeColorIdx);
   }
 
   int getIcon() {
-    return iconNames[activeIconIdx].codePoint;
+    return MaterialResources.getIconFromIdx(activeIconIdx);
   }
 
   getIconButton(IconData icon, Color color, int idx, bool select) {
@@ -149,8 +209,8 @@ class IconEditorState extends State<IconEditor> {
         crossAxisSpacing: 3,
         mainAxisSpacing: 3,
         padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
-        children: List.generate(colors.length, (index) {
-          return getColorButton(colors[index], index, index == activeColorIdx);
+        children: List.generate(MaterialResources.colors.length, (index) {
+          return getColorButton(MaterialResources.colors[index], index, index == activeColorIdx);
         })
     );
   }
@@ -162,9 +222,9 @@ class IconEditorState extends State<IconEditor> {
         crossAxisSpacing: 3,
         mainAxisSpacing: 3,
         padding: EdgeInsets.all(8),
-        children: List.generate(iconNames.length, (index) {
+        children: List.generate(MaterialResources.iconNames.length, (index) {
           return getIconButton(
-            iconNames[index], activeColor, index, index == activeIconIdx,);
+            MaterialResources.iconNames[index], activeColor, index, index == activeIconIdx,);
         })
     );
   }
