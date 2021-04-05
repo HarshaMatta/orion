@@ -61,21 +61,18 @@ class TileCard extends StatelessWidget {
               List<String> btns = new List<String>();
               btns.add("UPDATE");
               btns.add("DELETE");
-              parent.setNameCtrl(tile.name);
-              parent.setUrlCtrl(tile.url);
+
               parent.oldName = tile.name;
               parent.oldUrl = tile.url;
-              parent.createInputPopUp(btns,);
+              parent.createInputPopUp(
+                  btns,
+                  tile.url,
+                  tile.name,
+                  tile.color,
+                  tile.iconCodePoint);
 
           },
         )
     );
   }
 }
-
-// class RandomColor {
-//   Random random = Random();
-//   Color getColor() {
-//     return Color.fromARGB(random.nextInt(255), random.nextInt(255), random.nextInt(255), random.nextInt(255));
-//   }
-// }

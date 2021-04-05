@@ -14,6 +14,8 @@ class WebViewPage extends StatefulWidget {
 
 class WebViewPageState extends State<WebViewPage> {
   final String url;
+  bool isLoading = true;
+
   WebViewPageState({this.url});
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
@@ -34,30 +36,51 @@ class WebViewPageState extends State<WebViewPage> {
     super.initState();
   }
 
+  void onPageStarted(value) {
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+  void onPageFinished(value) {
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: WebView(
-          initialUrl : url,
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (WebViewController webViewController){
-            _controller.complete(webViewController);
-          },
+        child: Stack(
+          children: <Widget>[
+            WebView(
+              initialUrl: url,
+              javascriptMode: JavascriptMode.unrestricted,
+              onPageStarted: onPageStarted,
+              onPageFinished: onPageFinished,
+              onWebViewCreated: (WebViewController webViewController) {
+                _controller.complete(webViewController);
+              },
+            ),
+            isLoading ? Center(child: CircularProgressIndicator(),)
+                : Stack(),
+          ],
         ),
         bottom: false,
       ),
+
       floatingActionButton: FutureBuilder<WebViewController>(
 
-        future: _controller.future,
+          future: _controller.future,
           builder: (BuildContext context,
               AsyncSnapshot<WebViewController> controller) {
             if (controller.hasData) {
               return FloatingActionButton(
                   child: Icon(Icons.arrow_back),
                   onPressed: () => webViewGoBack(context)
-                  );
-              }
+              );
+            }
             return Container();
           }
 
@@ -65,5 +88,4 @@ class WebViewPageState extends State<WebViewPage> {
       ),
     );
   }
-
 }

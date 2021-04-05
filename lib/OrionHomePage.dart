@@ -1,11 +1,12 @@
 import 'dart:collection';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:orion/IconEditor.dart';
 import 'package:orion/Tile.dart';
 import 'package:orion/StringUtils.dart';
 import 'package:orion/Preferences.dart';
+import 'dart:async';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 class OrionHomePage extends StatefulWidget {
   OrionHomePage({Key key, this.title}) : super(key: key);
@@ -16,9 +17,10 @@ class OrionHomePage extends StatefulWidget {
 }
 
 class OrionHomePageState extends State<OrionHomePage> {
+  StreamSubscription intentDataStreamSubscription;
   TextEditingController nameCtrl;
   TextEditingController urlCtrl;
-  IconEditor iconEditor = new IconEditor();
+  IconEditor iconEditor = new IconEditor(0, 0);
   String oldName;
   String oldUrl;
   HashMap<String, Tile> tilesMap = new HashMap<String, Tile>();
@@ -50,9 +52,7 @@ class OrionHomePageState extends State<OrionHomePage> {
 
   void saveApp() {
     var name = "";
-    if (nameCtrl == null || nameCtrl.text.isEmpty) {
-      name = getDomain(urlCtrl.text);
-    } else {
+    if (nameCtrl != null && nameCtrl.text.isNotEmpty) {
       name = nameCtrl.text;
     }
     
@@ -124,7 +124,20 @@ class OrionHomePageState extends State<OrionHomePage> {
     );
   }
 
-  void createInputPopUp(List<String> btnNames) {
+  void createInputPopUp(
+      List<String> btnNames,
+      String url,
+      String name,
+      int colorVal,
+      int codePoint) {
+    int colIdx = MaterialResources.getColorIndex(colorVal);
+    int iconIdx = MaterialResources.getIconIndex(codePoint);
+    iconEditor.setColorIdx(colIdx);
+    iconEditor.setIconIdx(iconIdx);
+
+    urlCtrl.text = url;
+    nameCtrl.text = name;
+
     var popDialog = new Dialog(
       child: new Column(
           mainAxisSize: MainAxisSize.min,
@@ -162,12 +175,39 @@ class OrionHomePageState extends State<OrionHomePage> {
     showDialog(child: popDialog, context: context);
   }
 
+  void createInputPopUpWithAddBtn(String url, String name) {
+    List<String> btns = new List<String>();
+    btns.add("ADD");
+    createInputPopUp(btns, url, name, 0, 0);
+  }
+
   @override
   void initState() {
     nameCtrl = new TextEditingController();
     urlCtrl = new TextEditingController();
     super.initState();
     loadAppsFromPref();
+
+    // For sharing or opening urls/text coming from outside the app while the app is in the memory
+    intentDataStreamSubscription =
+        ReceiveSharingIntent.getTextStream().listen((String value) {
+          setState(() {
+            var name = getDomain(value);
+            createInputPopUpWithAddBtn(value, name);
+          });
+        }, onError: (err) {
+          print("getLinkStream error: $err");
+        });
+
+    // For sharing or opening urls/text coming from outside the app while the app is closed
+    ReceiveSharingIntent.getInitialText().then((String value) {
+      setState(() {
+        if(value.isNotEmpty) {
+          var name = getDomain(value);
+          createInputPopUpWithAddBtn(value, name);
+        }
+      });
+    });
   }
 
   @override
@@ -187,11 +227,12 @@ class OrionHomePageState extends State<OrionHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          nameCtrl.clear();
-          urlCtrl.clear();
+          // nameCtrl.clear();
+          // urlCtrl.clear();
           List<String> btns = new List<String>();
           btns.add("ADD");
-          createInputPopUp(btns);
+          // TODO:
+          createInputPopUp(btns, "", "", 0, 0);
         },
         tooltip: 'ShowDialog',
         child: Icon(Icons.add),
