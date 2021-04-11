@@ -172,7 +172,7 @@ class OrionHomePageState extends State<OrionHomePage> {
       ),
     );
 
-    showDialog(child: popDialog, context: context);
+    showDialog(context: context, builder: (_) => popDialog);
   }
 
   void createInputPopUpWithAddBtn(String url, String name) {
