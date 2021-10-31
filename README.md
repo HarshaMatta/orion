@@ -3,7 +3,7 @@
 Open websites in an App
 
 
-The app in on the google playstore:
+The app is on the google playstore:
 
 https://play.google.com/store/apps/details?id=com.xorbit.orion
 
